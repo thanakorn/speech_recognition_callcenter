@@ -1,0 +1,48 @@
+#JSGF V1.0;
+grammar callcenter;
+public <callcenter> = <question> | <report_problem>;
+
+/* Question */
+<question> = <package_questions> | <billing_questions>;
+
+// Package Question
+<package_questions> = <current_package> | <recommend_package>;
+<current_package> = [<current>] <package> | WHAT IS MY <package>;
+<recommend_package> = <package_category> <package> | (<recommend> [ME] | I <want>) <package_category> <package> | WHAT <package_category> <package> YOU HAVE;
+
+// Billing Question */
+<billing_questions> = <prepaid_questions> | <postpaid_questions>;
+
+<prepaid_questions> = <current_balance> | <expiration_date>;
+<current_balance> = [<current>] <balance> | WHAT IS MY [<current>] <balance> | HOW MUCH [MY] [<current>] <balance>;
+<expiration_date> = <expire> DATE | WHEN [MY] <account> <expire>;
+
+<postpaid_questions> = <current_bill> | <unpaid_bill> | <how_to>;
+<current_bill> = [<current>] <bill> | (HOW MUCH | WHAT IS) [MY] <bill> ;
+<unpaid_bill> = <unpaid> <bill>;
+<how_to> = HOW TO PAY [MY] <bill>;
+
+/* Report Problem */
+<report_problem>  = <internet_problem> | <calling_problem>;
+<internet_problem> = [I] <cannot> <connect> [THE] <internet> | HOW TO <setup> [THE] <internet>;
+<calling_problem> = [I] <cannot> <call>;
+
+// Package Category
+<package_category> = CALLING | INTERNET | CALLING AND INTERNET;
+
+// Synonym
+<want> = WANT | WOULD LIKE | REQUIRE | DESIRE;
+<package> = PACKAGE | PROMOTION;
+<balance> = BALANCE | MONEY | CASH;
+<expire> = EXPIRE | END;
+<account> = ACCOUNT;
+<bill> = BILL | INVOICE | CHECK | STATEMENT;
+<pay> = PAY | SPEND | GIVE;
+<unpaid> = UNPAID | OUTSTANDING | DUE | OVERDUE | BEHINDHAND | OWED;
+<recommend> = RECOMMEND | COMMEND | ADVICE | SUGGEST | PROPOSE;
+<connect> = CONNECT | ACCESS | OPEN | GET | ENTER;
+<cannot> = CANNOT | CAN'T | UNABLE TO;
+<setup> = SETUP | INSTALL | ENABLE | CONNECT;
+<internet> = INTERNET | NET | WEB;
+<call> = CALL | PHONE;
+<current> = CURRENT | PRESENT;
