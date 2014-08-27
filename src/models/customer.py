@@ -3,14 +3,17 @@ __author__ = 'thanakorn'
 
 class Customer(object):
 
-    def __init__(self, firstname, lastname, age, gender, phone_number):
+    def __init__(self, id, firstname, lastname, age, gender, phone_number):
+        self.id = id
         self.firstname = firstname
         self.lastname = lastname
         self.age = age
         self.gender = gender
         self.phone_number = phone_number
-        self.fullname = self.firstname + ' ' + self.lastname
+
+    def fullname(self):
+        return self.firstname + ' ' + self.lastname
 
     @classmethod
     def fromjson(cls, json):
-        return cls(json['firstname'], json['lastname'], json['age'], json['gender'], json['phone_number'])
+        return cls(json['_id'], json['firstname'], json['lastname'], json['age'], json['gender'], json['phone_number'])
