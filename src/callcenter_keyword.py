@@ -4,7 +4,7 @@ __author__ = 'thanakorn'
 import os
 
 
-class Keyword:
+class CallcenterKeyword(object):
 
     def __init__(self):
         self.keywords = {}
