@@ -10,4 +10,4 @@ class Speaker:
 
     @staticmethod
     def speak(msg):
-        call(['sapitest', msg, '-v', 'Mary', '-s', '1.0'])
+        call(['sapitest', msg, '-v', 'Mary', '-s', '0.8'])
