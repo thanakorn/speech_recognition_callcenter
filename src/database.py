@@ -1,5 +1,3 @@
-from src.models.postpaid import Postpaid
-
 __author__ = 'thanakorn'
 
 from pymongo import MongoClient
