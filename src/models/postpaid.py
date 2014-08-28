@@ -31,4 +31,4 @@ class Postpaid(object):
         return self.free_wifi == -1
 
     def description(self):
-        return '%s package monthly fee is %d baht. maximum calling time is %d minutes. you will be able to use internet at maximum speed equals %.2f gigabytes. after reach the limit, internet speed will limit to %d kilobytes and sms rate is %.2f baths per message' % (self.name, self.fee, self.calling_time, self.max_speed_data, self.overlimit_internet_speed, self.sms_rate)
+        return '%s package monthly fee is %d bahts. maximum calling time is %d minutes. you will be able to use internet at maximum speed for %.2f gigabytes. after reach the limit, internet speed will limit to %d kilobytes and SMS rate is %.2f bahts per message' % (self.name, self.fee, self.calling_time, self.max_speed_data, self.overlimit_internet_speed, self.sms_rate)
