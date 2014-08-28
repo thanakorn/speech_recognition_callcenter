@@ -66,7 +66,7 @@ class Database(object):
         return list
 
     @classmethod
-    def find_user_package(cls, id):
+    def find_user_account(cls, id):
         account = cls.find_one('accounts', 'customer', ObjectId(id))
         if account is not None:
             return account
