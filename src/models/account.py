@@ -14,4 +14,4 @@ class Account(object):
     def fromjson(cls, customer, package, json):
         if json is None:
             return None
-        cls(json['_id'], customer, package, json['balance'], json['expiration_date'])
+        return cls(json['_id'], customer, package, json['balance'], json['expiration_date'])
