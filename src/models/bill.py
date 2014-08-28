@@ -3,7 +3,7 @@ __author__ = 'thanakorn'
 
 class Bill(object):
 
-    def __init__(self, customer, package, id, calling_time, sms, internet, wifi, payment_date, paid):
+    def __init__(self, id, customer, package, calling_time, sms, internet, wifi, payment_date, paid):
         self.id = id
         self.customer = customer
         self.package = package
