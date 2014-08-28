@@ -19,3 +19,4 @@ reset = reset,halt,stop
 exit = exit,quit,out
 order = first,second,third,fourth,fifth,sixth,seventh,eighth,ninth,tenth,eleventh,twelveth,thirteenth,fourteenth,fifteenth,sixteenth,seventeenth,eighteenth,nineteenth,twentieth
 phone_os = android,ios,windows phone,blackberry
+package_category = calling,internet,calling and internet
