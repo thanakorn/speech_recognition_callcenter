@@ -10,4 +10,5 @@ class Speaker:
 
     @staticmethod
     def speak(msg):
-        call(['sapitest', msg, '-v', 'Mary', '-s', '0.8'])
+        for sentence in msg.split('. '):
+            call(['sapitest', sentence + '.', '-v', 'Mary', '-s', '0.9'])
