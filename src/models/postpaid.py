@@ -20,7 +20,7 @@ class Postpaid(object):
 
     @classmethod
     def fromjson(cls, json):
-        return cls(json['_id'], json['name'], json['type'], json['calling_time'], json['extra_calling_rate'], json['internet_data'], json['max_internet_speed'], json['max_speed_data'], json['overlimit_internet_speed'], json['sms_rate'], json['sms_rate'], json['free_wifi'], json['payment'])
+        return cls(json['_id'], json['name'], json['type'], json['calling_time'], json['extra_calling_rate'], json['internet_data'], json['max_internet_speed'], json['max_speed_data'], json['overlimit_internet_speed'], json['sms_rate'], json['free_wifi'], json['fee'], json['payment'])
 
     def is_internet_unlimited(self):
         return self.internet_data == -1
@@ -29,4 +29,4 @@ class Postpaid(object):
         return self.free_wifi == -1
 
     def description(self):
-        return '%s package monthly fee is %d baht. maximum calling time is %d minutes. you will be able to use internet at maximum speed equals %.2f gigabytes. after reach the limit, internet speed will limit to %d kilobytes and sms rate is %.2f baths per minutes' % (self.name, self.fee, self.calling_time, self.max_speed_data, self.overlimit_internet_speed, self.sms_rate)
+        return '%s package monthly fee is %d baht. maximum calling time is %d minutes. you will be able to use internet at maximum speed equals %.2f gigabytes. after reach the limit, internet speed will limit to %d kilobytes and sms rate is %.2f baths per message' % (self.name, self.fee, self.calling_time, self.max_speed_data, self.overlimit_internet_speed, self.sms_rate)
