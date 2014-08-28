@@ -21,6 +21,8 @@ class Prepaid(object):
 
     @classmethod
     def fromjson(cls, json):
+        if json is None:
+            return None
         return cls(json['_id'], json['name'], json['type'], json['internal_calling_rate'], json['external_calling_rate'], json['internet_data'], json['internet_rate'], json['sms_rate'], json['free_wifi'], json['wifi_rate'], json['initial_balance'], json['initial_date'], json['registration_fee'], json['payment'])
 
     def is_internet_unlimited(self):

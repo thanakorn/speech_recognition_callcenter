@@ -15,5 +15,7 @@ class Bill(object):
 
     @classmethod
     def fromjson(cls, customer, package,json):
+        if json is None:
+            return None
         cls(json['_id'], customer, package, json['calling_time'], json['sms'], json['internet'], json['wifi'], json['payment_date'], json['paid'])
 

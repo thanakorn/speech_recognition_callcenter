@@ -20,6 +20,8 @@ class Postpaid(object):
 
     @classmethod
     def fromjson(cls, json):
+        if json is None:
+            return None
         return cls(json['_id'], json['name'], json['type'], json['calling_time'], json['extra_calling_rate'], json['internet_data'], json['max_internet_speed'], json['max_speed_data'], json['overlimit_internet_speed'], json['sms_rate'], json['free_wifi'], json['fee'], json['payment'])
 
     def is_internet_unlimited(self):

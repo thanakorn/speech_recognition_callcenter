@@ -16,4 +16,6 @@ class Customer(object):
 
     @classmethod
     def fromjson(cls, json):
+        if json is None:
+            return None
         return cls(json['_id'], json['firstname'], json['lastname'], json['age'], json['gender'], json['phone_number'])
