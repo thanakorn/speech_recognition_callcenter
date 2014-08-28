@@ -36,9 +36,17 @@ class Database(object):
         if collection == 'postpaids':
             return Postpaid.fromjson(cls.db[collection].find_one({field: value}))
         if collection == 'accounts':
-            return Account.fromjson(cls.find_one('customers', field, value), cls.find_one('prepaids', field, value),cls.db[collection].find_one({field: value}))
+            account = cls.db[collection].find_one({field: value})
+            if account is not None:
+                return Account.fromjson(cls.find_by_id('customers', account['customer']), cls.find_by_id('prepaids', account['package']), account)
+            else:
+                return None
         if collection == 'bills':
-            return Bill.fromjson(cls.find_one('customers', field, value), cls.find_one('prepaids', field, value),cls.db[collection].find_one({field: value}))
+            bill = cls.db[collection].find_one({field: value})
+            if bill is not None:
+                return Bill.fromjson(cls.find_by_id('customers', bill['customer']), cls.find_by_id('postpaids', bill['package']), bill)
+            else:
+                return None
 
     @classmethod
     def find_list(cls, collection, field, value):
@@ -56,6 +64,16 @@ class Database(object):
             elif collection == 'bills':
                 list.append(Bill.fromjson(result))
         return list
+
+    @classmethod
+    def find_user_package(cls, id):
+        account = cls.find_one('accounts', 'customer', ObjectId(id))
+        if account is not None:
+            return account
+
+        bill = cls.find_one('bills', 'customer', ObjectId(id))
+        if bill is not None:
+            return bill
 
 if __name__ == '__main__':
     pass
