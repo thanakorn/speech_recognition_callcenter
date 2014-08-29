@@ -3,6 +3,7 @@ __author__ = 'thanakorn'
 
 class State:
 
+    ASK_NUMBER = 0
     NORMAL = 1
     REPEAT = 2
     SELECT_PACKAGE = 3
