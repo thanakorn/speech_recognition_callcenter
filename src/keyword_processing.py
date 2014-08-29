@@ -2,6 +2,7 @@ __author__ = 'thanakorn'
 
 
 import os
+from ordinal import Ordinal
 
 
 class KeywordProcessing(object):
@@ -22,3 +23,10 @@ class KeywordProcessing(object):
             if keyword in sentence:
                 return True
         return False
+
+    @classmethod
+    def get_index(cls, sentence):
+        for ordinal in cls.keywords['ordinal']:
+            if ordinal in sentence:
+                return Ordinal.ordinal[ordinal]
+        return None
