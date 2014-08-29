@@ -75,5 +75,9 @@ class Database(object):
         if bill is not None:
             return bill
 
+    @classmethod
+    def update(cls, collection, condition_field, condition_value, update_field, update_value):
+        cls.db[collection].update({condition_field: ObjectId(condition_value)}, {'$set': {update_field: ObjectId(update_value)}})
+
 if __name__ == '__main__':
     pass
