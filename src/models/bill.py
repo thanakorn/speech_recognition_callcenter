@@ -49,4 +49,4 @@ class Bill(object):
         return total
 
     def is_overdue(self):
-        return datetime.datetime.now() > self.payment_date
+        return not self.paid and (datetime.datetime.now() > self.payment_date)
