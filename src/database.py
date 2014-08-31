@@ -42,7 +42,7 @@ class Database(object):
             else:
                 return None
         if collection == 'bills':
-            bill = cls.db[collection].find_one({field: value})
+            bill = cls.db[collection].find({field: value}).sort('payment_date', -1)[0]
             if bill is not None:
                 return Bill.fromjson(cls.find_by_id('customers', bill['customer']), cls.find_by_id('postpaids', bill['package']), bill)
             else:
@@ -78,6 +78,11 @@ class Database(object):
     @classmethod
     def update(cls, collection, condition_field, condition_value, update_field, update_value):
         cls.db[collection].update({condition_field: ObjectId(condition_value)}, {'$set': {update_field: ObjectId(update_value)}})
+
+    @classmethod
+    def insert(cls, collection, json):
+        cls.db[collection].insert(json)
+
 
 if __name__ == '__main__':
     pass
