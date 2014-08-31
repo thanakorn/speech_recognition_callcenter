@@ -1,6 +1,7 @@
 __author__ = 'thanakorn'
 
 from bson.objectid import ObjectId
+import datetime
 
 
 class Bill(object):
@@ -38,3 +39,14 @@ class Bill(object):
             'paid': 1 if self.paid else 0
         }
         return json
+
+    def total(self):
+        total = self.package.fee
+        if self.calling_time > self.package.calling_time:
+            total += (self.calling_time - self.package.calling_time) * self.package.extra_call_rate
+        if self.sms > 0:
+            total += self.sms * self.package.sms_rate
+        return total
+
+    def is_overdue(self):
+        return datetime.datetime.now() > self.payment_date
