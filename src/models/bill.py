@@ -1,10 +1,15 @@
 __author__ = 'thanakorn'
 
+from bson.objectid import ObjectId
+
 
 class Bill(object):
 
-    def __init__(self, id, customer, package, calling_time, sms, internet, wifi, payment_date, paid):
-        self.id = id
+    def __init__(self, customer, package, calling_time, sms, internet, wifi, payment_date, paid, id=None):
+        if id is None:
+            self.id = ObjectId()
+        else:
+            self.id = id
         self.customer = customer
         self.package = package
         self.calling_time = calling_time
@@ -18,5 +23,18 @@ class Bill(object):
     def fromjson(cls, customer, package, json):
         if json is None:
             return None
-        return cls(json['_id'], customer, package, json['calling_time'], json['sms'], json['internet'], json['wifi'], json['payment_date'], json['paid'])
+        return cls(customer, package, json['calling_time'], json['sms'], json['internet'], json['wifi'], json['payment_date'], json['paid'], json['_id'])
 
+    def tojson(self):
+        json = {
+            '_id': ObjectId(),
+            'customer': ObjectId(self.customer.id),
+            'package': ObjectId(self.package.id),
+            'calling_time': self.calling_time,
+            'sms': self.sms,
+            'internet': self.internet,
+            'wifi': self.wifi,
+            'payment_date': self.payment_date,
+            'paid': 1 if self.paid else 0
+        }
+        return json
