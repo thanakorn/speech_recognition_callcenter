@@ -31,5 +31,8 @@ class Prepaid(object):
     def is_unlimited_wifi(self):
         return self.free_wifi == -1
 
+    def is_internet_avail(self):
+        return self.internet_rate == -1 or self.internet_rate > 0
+
     def description(self):
         return '%s package registration fee is %d baht. calling rate time is %d baht per minute. sms rate is %d baht per message. initial balance is %d baht and initial date is %d days' % (self.name, self.registration_fee, self.internal_calling_rate, self.sms_rate, self.initial_balance, self.initial_date)
