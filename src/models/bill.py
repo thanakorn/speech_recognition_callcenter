@@ -40,6 +40,9 @@ class Bill(object):
         }
         return json
 
+    def report(self):
+        return str('Your latest bill has month charges %.2f baht due on %d %s %d.' % (self.total(), self.expiration_date.strftime('%d'), self.expiration_date.strftime('%B'), self.expiration_date.strftime('%Y')))
+
     def total(self):
         total = self.package.fee
         if self.calling_time > self.package.calling_time:
