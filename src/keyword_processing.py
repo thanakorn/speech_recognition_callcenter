@@ -30,3 +30,10 @@ class KeywordProcessing(object):
             if ordinal in sentence:
                 return Ordinal.ordinal[ordinal]
         return None
+
+    @classmethod
+    def get_os(cls, sentence):
+        for os in cls.keywords['phone_os']:
+            if os in sentence:
+                return os
+        return None
