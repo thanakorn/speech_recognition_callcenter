@@ -7,6 +7,7 @@ from models.prepaid import Prepaid
 from models.postpaid import Postpaid
 from models.account import Account
 from models.bill import Bill
+from models.setup import Setup
 
 
 class Database(object):
@@ -35,6 +36,8 @@ class Database(object):
             return Prepaid.fromjson(cls.db[collection].find_one({field: value}))
         if collection == 'postpaids':
             return Postpaid.fromjson(cls.db[collection].find_one({field: value}))
+        if collection == 'setups':
+            return Setup.fromjson(cls.db[collection].find_one({field: value}))
         if collection == 'accounts':
             account = cls.db[collection].find_one({field: value})
             if account is not None:
