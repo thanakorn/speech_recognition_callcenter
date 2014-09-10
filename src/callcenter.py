@@ -7,6 +7,7 @@ from keyword_processing import KeywordProcessing
 from speaker import Speaker
 from database import Database
 from models.bill import Bill
+from bson.objectid import ObjectId
 import datetime
 
 
@@ -41,6 +42,7 @@ class Callcenter(Follwer):
         print('Callcenter receive msg : ' + msg)
 
         if self.state == State.NORMAL:
+            # Package category
             if KeywordProcessing.contains_keyword('package', msg):
                 # Current package
                 if KeywordProcessing.contains_keyword('current', msg):
@@ -63,6 +65,69 @@ class Callcenter(Follwer):
                     self.answer += str('Which one you want to have a detail. Or you want to listen again.')
                     # Change state
                     self.state = State.SELECT_PACKAGE
+
+            # Bill category
+            elif KeywordProcessing.contains_keyword('balance', msg) or KeywordProcessing.contains_keyword('expire', msg):
+                if self.user_account.payment.payment == 'postpaid':
+                    self.answer = str('Sorry, I don\'t understand your question')
+                elif KeywordProcessing.contains_keyword('balance', msg):
+                    self.answer = self.user_account.report()
+                    self.state = State.REPEAT
+                elif KeywordProcessing.contains_keyword('expire', msg):
+                    self.answer = str('Your account will expire on %d %s %d.' % (self.user_account.balance, self.user_account.expiration_date.strftime('%d'), self.user_account.expiration_date.strftime('%B'), self.user_account.expiration_date.strftime('%Y')))
+                    self.state = State.REPEAT
+            elif KeywordProcessing.contains_keyword('bill', msg):
+                if self.user_account.package.payment == 'postpaid':
+                    if KeywordProcessing.contains_keyword('current', msg) or KeywordProcessing.contains_keyword('how_much', msg):
+                        self.answer = self.user_account.report()
+                        self.state = State.REPEAT
+                    elif KeywordProcessing.contains_keyword('unpaid', msg):
+                        all_bills = Database.find_list('bills', 'customer', ObjectId(self.current_user.id))
+                        unpaid_bills = [bill for bill in all_bills if not bill.paid]
+                        self.answer = str('You have %d bills unpaid.' % len(unpaid_bills))
+                    elif KeywordProcessing.contains_keyword('how_to', msg) and KeywordProcessing.contains_keyword('pay', msg):
+                        pass
+                    elif KeywordProcessing.contains_keyword('when', msg):
+                        self.answer = str('Your bill is due on %d %s.' % (self.user_account.payment_date.strftime('%d'), self.user_account.payment_date.strftime('%B')))
+                else:
+                    self.answer = str('Sorry, I don\'t understand your question')
+
+            # Troubleshooting
+            elif KeywordProcessing.contains_keyword('cannot', msg):
+                # Prepaid user
+                if self.user_account.package.payment == 'prepaid':
+                    if KeywordProcessing.contains_keyword('internet', msg):
+                        if not self.user_account.package.is_internet_avail():
+                            self.answer = str('Sorry, your current package is not support internet using.')
+                        else:
+                            self.answer = str('Sorry, i can\'t find any problem in your account. I will transfer to operator in a minute.')
+                    elif KeywordProcessing.contains_keyword('call', msg):
+                        if self.user_account.balance <= self.user_account.package.internal_calling_rate:
+                            self.answer = str('Sorry, your current balance is not enough.')
+                        else:
+                            self.answer = str('Sorry, i can\'t find any problem in your account. I will transfer to operator in a minute.')
+
+                #Postpaid user
+                else:
+                    if KeywordProcessing.contains_keyword('internet', msg):
+                        if not self.user_account.package.is_internet_avail():
+                            self.answer = str('Sorry, your current package is not support internet using.')
+                        elif len([bill for bill in Database.find_list('bills', 'paid', False) if not bill.paid]) > 3:
+                            self.answer = str('Sorry, your account was suspended because you haven\'t pay monthly fee.')
+                        else:
+                            self.answer = str('Sorry, i can\'t find any problem in your account. I will transfer to operator in a minute.')
+                    elif KeywordProcessing.contains_keyword('call', msg):
+                        if self.user_account.package.payment == 'postpaid' and len([bill for bill in Database.find_list('bills', 'paid', False) if not bill.paid]) > 3:
+                            self.answer = str('Sorry, your account was suspended because you haven\'t pay monthly fee.')
+                        else:
+                            self.answer = str('Sorry, i can\'t find any problem in your account. I will transfer to operator in a minute.')
+
+            elif KeywordProcessing.contains_keyword('setup', msg):
+                self.answer = str('What is your operating system.')
+                self.state = State.SELECT_PHONE_OS
+
+            elif KeywordProcessing.contains_keyword('how_to', msg):
+                pass
 
         elif self.state == State.REPEAT:
             # Repeat
@@ -94,12 +159,17 @@ class Callcenter(Follwer):
                     # Create new bill
                     new_bill = Bill(self.current_user, self.interesting_package, 0, 0, 0, 0, datetime.datetime.now(), 0)
                     Database.insert('bills', new_bill.tojson())
-                self.answer = 'package change is complete.'
+                self.answer = 'package changing is complete.'
                 # Get new user account
                 self.user_account = Database.find_user_account(self.current_user.id)
                 self.state = State.NORMAL
             elif KeywordProcessing.contains_keyword('cancel', msg):
                 self.state = State.NORMAL
+
+        elif self.state == State.SELECT_PHONE_OS:
+            if KeywordProcessing.contains_keyword('phone_os', msg):
+                self.answer = Database.find_one('setups', 'os', msg).setup
+                self.state = State.REPEAT
 
         if self.answer is not None:
             Speaker.speak(self.answer)
