@@ -41,7 +41,13 @@ class Callcenter(Follwer):
 
         print('Callcenter receive msg : ' + msg)
 
-        if self.state == State.NORMAL:
+        if KeywordProcessing.contains_keyword('exit', msg):
+            self.answer = str('Thank you for using our service. Goodbye.')
+            self.state = State.EXIT
+        elif KeywordProcessing.contains_keyword('reset', msg):
+            self.answer = str('How can i help you.')
+            self.state = State.NORMAL
+        elif self.state == State.NORMAL:
             # Package category
             if KeywordProcessing.contains_keyword('package', msg):
                 # Current package
@@ -68,7 +74,7 @@ class Callcenter(Follwer):
 
             # Bill category
             elif KeywordProcessing.contains_keyword('balance', msg) or KeywordProcessing.contains_keyword('expire', msg):
-                if self.user_account.payment.payment == 'postpaid':
+                if self.user_account.package.payment == 'postpaid':
                     self.answer = str('Sorry, I don\'t understand your question')
                 elif KeywordProcessing.contains_keyword('balance', msg):
                     self.answer = self.user_account.report()
@@ -86,7 +92,8 @@ class Callcenter(Follwer):
                         unpaid_bills = [bill for bill in all_bills if not bill.paid]
                         self.answer = str('You have %d bills unpaid.' % len(unpaid_bills))
                     elif KeywordProcessing.contains_keyword('how_to', msg) and KeywordProcessing.contains_keyword('pay', msg):
-                        pass
+                        self.answer = str('Please select your payment method. Online or phone.')
+                        self.state = State.SELECT_PAYMENT_METHOD
                     elif KeywordProcessing.contains_keyword('when', msg):
                         self.answer = str('Your bill is due on %d %s.' % (self.user_account.payment_date.strftime('%d'), self.user_account.payment_date.strftime('%B')))
                 else:
@@ -100,12 +107,14 @@ class Callcenter(Follwer):
                         if not self.user_account.package.is_internet_avail():
                             self.answer = str('Sorry, your current package is not support internet using.')
                         else:
-                            self.answer = str('Sorry, i can\'t find any problem in your account. I will transfer to operator in a minute.')
+                            self.answer = str('Sorry, i can\'t find any problem in your account. Do you want to talk to the operator.')
+                            self.state = State.TALK_TO_OPERATOR
                     elif KeywordProcessing.contains_keyword('call', msg):
                         if self.user_account.balance <= self.user_account.package.internal_calling_rate:
                             self.answer = str('Sorry, your current balance is not enough.')
                         else:
-                            self.answer = str('Sorry, i can\'t find any problem in your account. I will transfer to operator in a minute.')
+                            self.answer = str('Sorry, i can\'t find any problem in your account. Do you want to talk to the operator.')
+                            self.state = State.TALK_TO_OPERATOR
 
                 #Postpaid user
                 else:
@@ -115,19 +124,18 @@ class Callcenter(Follwer):
                         elif len([bill for bill in Database.find_list('bills', 'paid', False) if not bill.paid]) > 3:
                             self.answer = str('Sorry, your account was suspended because you haven\'t pay monthly fee.')
                         else:
-                            self.answer = str('Sorry, i can\'t find any problem in your account. I will transfer to operator in a minute.')
+                            self.answer = str('Sorry, i can\'t find any problem in your account. Do you want to talk to the operator.')
+                            self.state = State.TALK_TO_OPERATOR
                     elif KeywordProcessing.contains_keyword('call', msg):
-                        if self.user_account.package.payment == 'postpaid' and len([bill for bill in Database.find_list('bills', 'paid', False) if not bill.paid]) > 3:
+                        if self.user_account.package.payment == 'postpaid' and len([bill for bill in Database.find_list('bills', 'customer', self.current_user.id) if not bill.paid]) > 3:
                             self.answer = str('Sorry, your account was suspended because you haven\'t pay monthly fee.')
                         else:
-                            self.answer = str('Sorry, i can\'t find any problem in your account. I will transfer to operator in a minute.')
+                            self.answer = str('Sorry, i can\'t find any problem in your account. Do you want to talk to the operator.')
+                            self.state = State.TALK_TO_OPERATOR
 
             elif KeywordProcessing.contains_keyword('setup', msg):
                 self.answer = str('What is your operating system.')
                 self.state = State.SELECT_PHONE_OS
-
-            elif KeywordProcessing.contains_keyword('how_to', msg):
-                pass
 
         elif self.state == State.REPEAT:
             # Repeat
@@ -149,6 +157,8 @@ class Callcenter(Follwer):
                 self.answer = str(self.interesting_package.description())
                 self.answer += str(' Do you want to use this package.')
                 self.state = State.CHANGE_PACKAGE
+            else:
+                self.answer = str('Sorry, i don\'t understand.')
 
         elif self.state == State.CHANGE_PACKAGE:
             if KeywordProcessing.contains_keyword('confirm', msg):
@@ -165,11 +175,29 @@ class Callcenter(Follwer):
                 self.state = State.NORMAL
             elif KeywordProcessing.contains_keyword('cancel', msg):
                 self.state = State.NORMAL
+            else:
+                self.answer = str('Sorry, i don\'t understand.')
 
         elif self.state == State.SELECT_PHONE_OS:
             if KeywordProcessing.contains_keyword('phone_os', msg):
                 self.answer = Database.find_one('setups', 'os', msg).setup
                 self.state = State.REPEAT
+            else:
+                self.answer = str('Sorry, we cannot find your operating system.')
+
+        elif self.state == State.SELECT_PAYMENT_METHOD:
+            if KeywordProcessing.contains_keyword('payment_method', msg):
+                self.answer = Database.find_one('how_to_pays', 'method', msg).step
+                self.state = State.REPEAT
+            else:
+                self.answer = str('Sorry, your payment method is not available.')
+
+        elif self.state == State.TALK_TO_OPERATOR:
+            if KeywordProcessing.contains_keyword('confirm', msg):
+                self.answer = str('Transfer to operator. please wait for seconds.')
+            elif KeywordProcessing.contains_keyword('cancel', msg):
+                self.answer = str('How can i help you.')
+                self.state = State.NORMAL
 
         if self.answer is not None:
             Speaker.speak(self.answer)
