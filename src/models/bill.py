@@ -21,7 +21,7 @@ class Bill(object):
         self.paid = True if paid == 1 else False
 
     @classmethod
-    def fromjson(cls, customer, package, json):
+    def fromjson(cls, json, customer=None, package=None):
         if json is None:
             return None
         return cls(customer, package, json['calling_time'], json['sms'], json['internet'], json['wifi'], json['payment_date'], json['paid'], json['_id'])
@@ -41,7 +41,7 @@ class Bill(object):
         return json
 
     def report(self):
-        return str('Your latest bill has month charges %.2f baht due on %d %s %d.' % (self.total(), self.expiration_date.strftime('%d'), self.expiration_date.strftime('%B'), self.expiration_date.strftime('%Y')))
+        return str('Your latest bill has month charges %.2f baht due on %s %s %s.' % (self.total(), self.payment_date.strftime('%d'), self.payment_date.strftime('%B'), self.payment_date.strftime('%Y')))
 
     def total(self):
         total = self.package.fee

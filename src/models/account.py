@@ -17,4 +17,4 @@ class Account(object):
         return cls(json['_id'], customer, package, json['balance'], json['expiration_date'])
 
     def report(self):
-        return str('Your current balance is %d baht expire on %d %s %d.' % (self.user_account.balance, self.user_account.expiration_date.strftime('%d'), self.user_account.expiration_date.strftime('%B'), self.user_account.expiration_date.strftime('%Y')))
+        return str('Your current balance is %d baht expire on %s %s %s.' % (self.balance, self.expiration_date.strftime('%d'), self.expiration_date.strftime('%B'), self.expiration_date.strftime('%Y')))
