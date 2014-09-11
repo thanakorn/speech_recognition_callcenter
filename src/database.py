@@ -8,6 +8,7 @@ from models.postpaid import Postpaid
 from models.account import Account
 from models.bill import Bill
 from models.setup import Setup
+from models.howtopay import HowToPay
 
 
 class Database(object):
@@ -38,6 +39,9 @@ class Database(object):
             return Postpaid.fromjson(cls.db[collection].find_one({field: value}))
         if collection == 'setups':
             return Setup.fromjson(cls.db[collection].find_one({field: value}))
+        if collection == 'how_to_pays':
+            print(cls.db[collection].find_one({field: value}))
+            return HowToPay.fromjson(cls.db[collection].find_one({field: value}))
         if collection == 'accounts':
             account = cls.db[collection].find_one({field: value})
             if account is not None:
@@ -47,7 +51,7 @@ class Database(object):
         if collection == 'bills':
             bill = cls.db[collection].find({field: value}).sort('payment_date', -1)[0]
             if bill is not None:
-                return Bill.fromjson(cls.find_by_id('customers', bill['customer']), cls.find_by_id('postpaids', bill['package']), bill)
+                return Bill.fromjson(bill, cls.find_by_id('customers', bill['customer']), cls.find_by_id('postpaids', bill['package']))
             else:
                 return None
 
