@@ -1,6 +1,6 @@
 #JSGF V1.0;
 grammar callcenter;
-public <callcenter> = <question> | <report_problem> | <confirm> | <cancel> | <reset> | <order> | <phone_os> | <exit>;
+public <callcenter> = <question> | <report_problem> | <confirm> | <cancel> | <reset> | <order> | <phone_os> | <payment_method> | <exit>;
 
 /* Question */
 <question> = <package_questions> | <billing_questions>;
@@ -52,4 +52,5 @@ public <callcenter> = <question> | <report_problem> | <confirm> | <cancel> | <re
 <exit> = EXIT | QUIT | OUT;
 <order> = FIRST | SECOND | THIRD | FOURTH | FIFTH | SIXTH | SEVENTH | EIGHTH | NINTH | TENTH | ELEVENTH | TWELVETH | THIRTEENTH | FOURTEENTH | FIFTEENTH | SIXTEENTH | SEVENTEENTH | EIGHTEENTH | NINETEENTH | TWENTIETH;
 <phone_os> = ANDROID | IOS | WINDOWS PHONE | BLACKBERRY;
+<payment_method> = ONLINE | PHONE;
 
