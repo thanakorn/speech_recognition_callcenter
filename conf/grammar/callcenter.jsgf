@@ -7,7 +7,7 @@ public <callcenter> = <question> | <report_problem> | <confirm> | <cancel> | <re
 
 // Package Question
 <package_questions> = <current_package> | <recommend_package>;
-<current_package> = [<current>] <package> | WHAT IS MY <package>;
+<current_package> = [<current>] <package> | WHAT IS MY [<current>] <package>;
 <recommend_package> = <package_category> <package> | (<recommend> [ME] | I <want>) <package_category> <package> | WHAT <package_category> <package> YOU HAVE;
 
 // Billing Question */
@@ -50,7 +50,7 @@ public <callcenter> = <question> | <report_problem> | <confirm> | <cancel> | <re
 <cancel> = NO | NOT | CANCEL;
 <reset> = RESET | HALT | STOP;
 <exit> = EXIT | QUIT | OUT;
-<order> = FIRST | SECOND | THIRD | FOURTH | FIFTH | SIXTH | SEVENTH | EIGHTH | NINTH | TENTH | ELEVENTH | TWELVETH | THIRTEENTH | FOURTEENTH | FIFTEENTH | SIXTEENTH | SEVENTEENTH | EIGHTEENTH | NINETEENTH | TWENTIETH;
+<order> = [THE] (FIRST | SECOND | THIRD | FOURTH | FIFTH | SIXTH | SEVENTH | EIGHTH | NINTH | TENTH) ONE;
 <phone_os> = ANDROID | IOS | WINDOWS PHONE | BLACKBERRY;
 <payment_method> = ONLINE | PHONE;
 
