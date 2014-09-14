@@ -35,4 +35,4 @@ class Prepaid(object):
         return self.internet_rate == -1 or self.internet_rate > 0
 
     def description(self):
-        return '%s package registration fee is %d baht. calling rate time is %d baht per minute. sms rate is %d baht per message. initial balance is %d baht and initial date is %d days' % (self.name, self.registration_fee, self.internal_calling_rate, self.sms_rate, self.initial_balance, self.initial_date)
+        return '%s package registration fee is %d baht. calling rate is %d baht per minute. sms rate is %d baht per message. initial balance is %d baht and initial date is %d days' % (self.name, self.registration_fee, self.internal_calling_rate, self.sms_rate, self.initial_balance, self.initial_date)
