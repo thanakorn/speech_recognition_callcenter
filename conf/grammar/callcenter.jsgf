@@ -1,6 +1,6 @@
 #JSGF V1.0;
 grammar callcenter;
-public <callcenter> = <question> | <report_problem> | <confirm> | <cancel> | <reset> | <order> | <phone_os> | <payment_method> | <exit>;
+public <callcenter> = <question> | <report_problem> | <call_operator> | <confirm> | <cancel> | <reset> | <order> | <phone_os> | <payment_method> | <exit>;
 
 /* Question */
 <question> = <package_questions> | <billing_questions>;
@@ -13,19 +13,23 @@ public <callcenter> = <question> | <report_problem> | <confirm> | <cancel> | <re
 // Billing Question */
 <billing_questions> = <prepaid_questions> | <postpaid_questions>;
 
-<prepaid_questions> = <current_balance> | <expiration_date>;
+<prepaid_questions> = <current_balance> | <expiration_date> | <how_to_topup>;
 <current_balance> = [<current>] <balance> | WHAT IS MY [<current>] <balance> | HOW MUCH [MY] [<current>] <balance>;
 <expiration_date> = <expire> DATE | WHEN [MY] <account> <expire>;
+<how_to_topup> = (HOW TO | HOW CAN) <topup> [MY] <account>;
 
-<postpaid_questions> = <current_bill> | <unpaid_bill> | <how_to>;
+<postpaid_questions> = <current_bill> | <unpaid_bill> | <how_to_pay>;
 <current_bill> = [<current>] <bill> | (HOW MUCH | WHAT IS) [MY] <bill> ;
 <unpaid_bill> = <unpaid> <bill>;
-<how_to> = HOW TO PAY [MY] <bill>;
+<how_to_pay> = (HOW TO | HOW CAN) <pay> [MY] <bill>;
 
 /* Report Problem */
 <report_problem>  = <internet_problem> | <calling_problem>;
 <internet_problem> = [I] <cannot> <connect> [THE] <internet> | HOW TO <setup> [THE] <internet>;
 <calling_problem> = [I] <cannot> <call>;
+
+/* Call operator */
+<call_operator> = (I WANT | CALL ME) <operator>;
 
 // Package Category
 <package_category> = CALLING | INTERNET | CALLING AND INTERNET;
@@ -38,6 +42,7 @@ public <callcenter> = <question> | <report_problem> | <confirm> | <cancel> | <re
 <account> = ACCOUNT;
 <bill> = BILL | INVOICE | CHECK | STATEMENT;
 <pay> = PAY | SPEND | GIVE;
+<topup> = TOPUP;
 <unpaid> = UNPAID | OUTSTANDING | DUE | OVERDUE | BEHINDHAND | OWED;
 <recommend> = RECOMMEND | COMMEND | ADVICE | SUGGEST | PROPOSE;
 <connect> = CONNECT | ACCESS | OPEN | GET | ENTER;
@@ -48,9 +53,10 @@ public <callcenter> = <question> | <report_problem> | <confirm> | <cancel> | <re
 <current> = CURRENT | PRESENT;
 <confirm> = YES | YEAH | ALL RIGHT | OK;
 <cancel> = NO | NOT | CANCEL;
-<reset> = RESET | HALT | STOP;
-<exit> = EXIT | QUIT | OUT;
+<reset> = RESET | STOP;
+<exit> = EXIT | QUIT;
 <order> = [THE] (FIRST | SECOND | THIRD | FOURTH | FIFTH | SIXTH | SEVENTH | EIGHTH | NINTH | TENTH) ONE;
 <phone_os> = ANDROID | IOS | WINDOWS PHONE | BLACKBERRY;
 <payment_method> = ONLINE | PHONE;
+<operator> = OPERATOR;
 
