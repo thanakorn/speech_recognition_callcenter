@@ -9,6 +9,7 @@ from models.account import Account
 from models.bill import Bill
 from models.setup import Setup
 from models.howtopay import HowToPay
+from models.howtotopup import HowToTopup
 
 
 class Database(object):
@@ -40,8 +41,9 @@ class Database(object):
         if collection == 'setups':
             return Setup.fromjson(cls.db[collection].find_one({field: value}))
         if collection == 'how_to_pays':
-            print(cls.db[collection].find_one({field: value}))
             return HowToPay.fromjson(cls.db[collection].find_one({field: value}))
+        if collection == 'how_to_topups':
+            return HowToTopup.fromjson(cls.db[collection].find_one({field: value}))
         if collection == 'accounts':
             account = cls.db[collection].find_one({field: value})
             if account is not None:
