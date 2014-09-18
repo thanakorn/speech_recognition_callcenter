@@ -1,0 +1,56 @@
+# Package
+	Ask current package : 
+		- Current package
+		- What is [my] [current] package
+	Ask for recommend package :
+		- (calling, internet, calling and internet) package
+		- I want (calling, internet, calling and internet) package
+		- Recommend [me] (calling, internet, calling and internet) package
+		- What (calling, internet, calling and internet) package you have?
+
+# Billing
+	# Prepaid
+		Current balance
+			- Current balance
+			- What is my [current] balance?
+			- How much my [current] balance?
+		Account expiration date
+			- Expire date?
+			- When my account expire?
+	# Postpaid
+		Current bill
+			- Current bill
+			- What is my bill?
+			- How much my bill?
+		Unpaid bill
+			- Unpaid bill
+
+# Troubleshooting
+	# Internet 
+		- Cannot connect internet
+		- I cannot access internet
+	# Internet
+		- I cannot call,phone
+
+# How to
+	# Bill payment
+		- How to pay my bill?
+	# Topup
+		- How to topup my account?
+	# Setup internet
+		- How to setup internet?
+
+# Call operator
+	- Call me operator
+	- I want operator
+
+* Synonym *
+package <=> promotion
+recommend <=> suggest
+bill <=> statement, invoice 
+balance <=> money, cash
+expire <=> end
+unpaid <=> outstanding, owed
+connect <=> access, open, enter
+pay <=> spend
+setup <=> install, enable
