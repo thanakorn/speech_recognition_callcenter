@@ -4,7 +4,7 @@ class HowToPay(object):
 
     def __init__(self, id, method, step):
         self.id = id
-        self.os = method
+        self.method = method
         self.step = step
 
     @classmethod
