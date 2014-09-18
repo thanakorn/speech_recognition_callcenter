@@ -9,6 +9,7 @@ from database import Database
 from models.bill import Bill
 from bson.objectid import ObjectId
 import datetime
+from subprocess import call
 
 
 class Callcenter(Follwer):
@@ -23,8 +24,8 @@ class Callcenter(Follwer):
         self.interesting_package = None
 
         Speaker.speak('Please tell your phone number.')
-        # number = raw_input('Phone number : ')
-        number = '0836990198'  # postpaid dummy
+        number = raw_input('Phone number : ')
+        # number = '0836990198'  # postpaid dummy
         # number = '0879987123'  # prepaid dummy
         self.current_user = Database.find_one('customers', 'phone_number', number)
         self.user_account = Database.find_user_account(self.current_user.id)
@@ -44,33 +45,46 @@ class Callcenter(Follwer):
         if KeywordProcessing.contains_keyword('exit', msg):
             self.answer = str('Thank you for using our service. Goodbye.')
             self.state = State.EXIT
+            self.recognizer.shutdown()
         elif KeywordProcessing.contains_keyword('reset', msg):
             self.answer = str('How can i help you.')
             self.state = State.NORMAL
+        elif KeywordProcessing.contains_keyword('operator', msg):
+            self.answer = str('Do you want to talk to operator.')
+            self.state = State.TALK_TO_OPERATOR
         elif self.state == State.NORMAL:
             # Package category
             if KeywordProcessing.contains_keyword('package', msg):
-                # Current package
-                if KeywordProcessing.contains_keyword('current', msg):
-                    self.answer = str('Your current package is %s' % self.user_account.package.description())
-                    # Change state
-                    self.state = State.REPEAT
                 # Recommend package
-                elif KeywordProcessing.contains_keyword('package_category', msg):
+                if KeywordProcessing.contains_keyword('package_category', msg):
                     package_category = [c for c in KeywordProcessing.keywords['package_category'] if c in msg][0]
                     # Find interesting packages
                     if self.user_account.package.payment == 'prepaid':
                         self.recommend_packages = Database.find_list('prepaids', 'type', package_category)
                     else:
                         self.recommend_packages = Database.find_list('postpaids', 'type', package_category)
-
                     # Generate answer
                     self.answer = str('We recommend %d packages for you. ' % len(self.recommend_packages))
                     for package in self.recommend_packages:
                         self.answer += package.name + '. '
                     self.answer += str('Which one you want to have a detail. Or you want to listen again.')
-                    # Change state
-                    self.state = State.SELECT_PACKAGE
+                    self.state = State.SELECT_PACKAGE   # Change state
+                # Current package
+                else:
+                    self.answer = str('Your current package is %s' % self.user_account.package.description())
+                    self.state = State.REPEAT   # Change state
+
+            # How to
+            elif KeywordProcessing.contains_keyword('how_to', msg):
+                if KeywordProcessing.contains_keyword('topup', msg):
+                    self.answer = str('Please select your topup method. Online or phone.')
+                    self.state = State.SELECT_TOPUP_METHOD
+                elif KeywordProcessing.contains_keyword('pay', msg):
+                    self.answer = str('Please select your payment method. Online or phone.')
+                    self.state = State.SELECT_PAYMENT_METHOD
+                elif KeywordProcessing.contains_keyword('setup', msg):
+                    self.answer = str('What is your operating system.')
+                    self.state = State.SELECT_PHONE_OS
 
             # Bill category
             elif KeywordProcessing.contains_keyword('balance', msg) or KeywordProcessing.contains_keyword('expire', msg):
@@ -80,22 +94,26 @@ class Callcenter(Follwer):
                     self.answer = self.user_account.report()
                     self.state = State.REPEAT
                 elif KeywordProcessing.contains_keyword('expire', msg):
-                    self.answer = str('Your account will expire on %d %s %d.' % (self.user_account.balance, self.user_account.expiration_date.strftime('%d'), self.user_account.expiration_date.strftime('%B'), self.user_account.expiration_date.strftime('%Y')))
+                    self.answer = str('Your account will expire on %s %s %s.' % (self.user_account.expiration_date.strftime('%d'), self.user_account.expiration_date.strftime('%B'), self.user_account.expiration_date.strftime('%Y')))
                     self.state = State.REPEAT
+
             elif KeywordProcessing.contains_keyword('bill', msg):
                 if self.user_account.package.payment == 'postpaid':
-                    if KeywordProcessing.contains_keyword('current', msg) or KeywordProcessing.contains_keyword('how_much', msg):
-                        self.answer = self.user_account.report()
-                        self.state = State.REPEAT
-                    elif KeywordProcessing.contains_keyword('unpaid', msg):
+                    if KeywordProcessing.contains_keyword('unpaid', msg):
                         all_bills = Database.find_list('bills', 'customer', ObjectId(self.current_user.id))
                         unpaid_bills = [bill for bill in all_bills if not bill.paid]
-                        self.answer = str('You have %d bills unpaid.' % len(unpaid_bills))
+                        if(len(unpaid_bills) > 0):
+                            self.answer = str('You have %d bills unpaid.' % len(unpaid_bills))
+                        else:
+                            self.answer = str('You don\' have any unpaid bill.')
                     elif KeywordProcessing.contains_keyword('how_to', msg) and KeywordProcessing.contains_keyword('pay', msg):
                         self.answer = str('Please select your payment method. Online or phone.')
                         self.state = State.SELECT_PAYMENT_METHOD
                     elif KeywordProcessing.contains_keyword('when', msg):
                         self.answer = str('Your bill is due on %d %s.' % (self.user_account.payment_date.strftime('%d'), self.user_account.payment_date.strftime('%B')))
+                    else:
+                        self.answer = self.user_account.report()
+                        self.state = State.REPEAT
                 else:
                     self.answer = str('Sorry, I don\'t understand your question')
 
@@ -121,7 +139,7 @@ class Callcenter(Follwer):
                     if KeywordProcessing.contains_keyword('internet', msg):
                         if not self.user_account.package.is_internet_avail():
                             self.answer = str('Sorry, your current package is not support internet using.')
-                        elif len([bill for bill in Database.find_list('bills', 'paid', False) if not bill.paid]) > 3:
+                        elif len([bill for bill in Database.find_list('bills', 'customer', self.current_user.id) if not bill.paid]) > 3:
                             self.answer = str('Sorry, your account was suspended because you haven\'t pay monthly fee.')
                         else:
                             self.answer = str('Sorry, i can\'t find any problem in your account. Do you want to talk to the operator.')
@@ -133,25 +151,24 @@ class Callcenter(Follwer):
                             self.answer = str('Sorry, i can\'t find any problem in your account. Do you want to talk to the operator.')
                             self.state = State.TALK_TO_OPERATOR
 
-            elif KeywordProcessing.contains_keyword('setup', msg):
-                self.answer = str('What is your operating system.')
-                self.state = State.SELECT_PHONE_OS
-
         elif self.state == State.REPEAT:
             # Repeat
             if KeywordProcessing.contains_keyword('confirm', msg):
                 pass
             # Back to normal
             elif KeywordProcessing.contains_keyword('cancel', msg):
-                self.answer = 'How can i help you?'
+                self.answer = 'How can i help you.'
                 self.state = State.NORMAL
 
         elif self.state == State.SELECT_PACKAGE:
             # Repeat
             if KeywordProcessing.contains_keyword('confirm', msg):
                 pass
+            elif KeywordProcessing.contains_keyword('cancel', msg):
+                self.answer = 'How can i help you.'
+                self.state = State.NORMAL
             # Explain user's interesting package detail
-            elif KeywordProcessing.contains_keyword('ordinal', msg):
+            elif KeywordProcessing.contains_keyword('ordinal', msg) and KeywordProcessing.get_index(msg) - 1 < len(self.recommend_packages):
                 index = KeywordProcessing.get_index(msg) - 1
                 self.interesting_package = self.recommend_packages[index]
                 self.answer = str(self.interesting_package.description())
@@ -174,6 +191,7 @@ class Callcenter(Follwer):
                 self.user_account = Database.find_user_account(self.current_user.id)
                 self.state = State.NORMAL
             elif KeywordProcessing.contains_keyword('cancel', msg):
+                self.answer = 'How can i help you.'
                 self.state = State.NORMAL
             else:
                 self.answer = str('Sorry, i don\'t understand.')
@@ -188,6 +206,13 @@ class Callcenter(Follwer):
         elif self.state == State.SELECT_PAYMENT_METHOD:
             if KeywordProcessing.contains_keyword('payment_method', msg):
                 self.answer = Database.find_one('how_to_pays', 'method', msg).step
+                self.state = State.REPEAT
+            else:
+                self.answer = str('Sorry, your payment method is not available.')
+
+        elif self.state == State.SELECT_TOPUP_METHOD:
+            if KeywordProcessing.contains_keyword('payment_method', msg):
+                self.answer = Database.find_one('how_to_topups', 'method', msg).step
                 self.state = State.REPEAT
             else:
                 self.answer = str('Sorry, your payment method is not available.')
@@ -208,4 +233,5 @@ class Callcenter(Follwer):
         self.recognizer.resume()    # Resume Speech recognizer
 
 if __name__ == '__main__':
+    call(['sh', '~/bin/sapi_server.sh'])  # Start SAPI service
     callcenter = Callcenter()
