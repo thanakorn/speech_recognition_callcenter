@@ -25,8 +25,6 @@ class Callcenter(Follwer):
 
         Speaker.speak('Please tell your phone number.')
         number = raw_input('Phone number : ')
-        # number = '0836990198'  # postpaid dummy
-        # number = '0879987123'  # prepaid dummy
         self.current_user = Database.find_one('customers', 'phone_number', number)
         self.user_account = Database.find_user_account(self.current_user.id)
         # If phone no is exist, Greeting
@@ -65,8 +63,10 @@ class Callcenter(Follwer):
                         self.recommend_packages = Database.find_list('postpaids', 'type', package_category)
                     # Generate answer
                     self.answer = str('We recommend %d packages for you. ' % len(self.recommend_packages))
+                    index = 1
                     for package in self.recommend_packages:
-                        self.answer += package.name + '. '
+                        self.answer += str('package number %d %s . ' % (index, package.name))
+                        index += 1
                     self.answer += str('Which one you want to have a detail. Or you want to listen again.')
                     self.state = State.SELECT_PACKAGE   # Change state
                 # Current package
@@ -233,5 +233,5 @@ class Callcenter(Follwer):
         self.recognizer.resume()    # Resume Speech recognizer
 
 if __name__ == '__main__':
-    call(['sh', '~/bin/sapi_server.sh'])  # Start SAPI service
+    call(['sh', '/home/ksukvichai/bin/sapi_server.sh'])  # Start SAPI service
     callcenter = Callcenter()
