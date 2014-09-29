@@ -12,4 +12,5 @@ class State:
     SELECT_PAYMENT_METHOD = 6
     SELECT_TOPUP_METHOD = 7
     TALK_TO_OPERATOR = 8
+    EXIT_CONFIRM = 9
     EXIT = -1

@@ -1,6 +1,6 @@
 __author__ = 'thanakorn'
 
-from src.publisher import Publisher
+from publisher import Publisher
 import pygtk
 pygtk.require('2.0')
 import gtk

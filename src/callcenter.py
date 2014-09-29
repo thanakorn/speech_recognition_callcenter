@@ -1,8 +1,8 @@
 __author__ = 'thanakorn'
 
-from src.follower import Follwer
-from src.speech_recognizer import SpeechRecognizer
-from src.state import State
+from follower import Follwer
+from speech_recognizer import SpeechRecognizer
+from state import State
 from keyword_processing import KeywordProcessing
 from speaker import Speaker
 from database import Database
@@ -41,9 +41,8 @@ class Callcenter(Follwer):
         print('Callcenter receive msg : ' + msg)
 
         if KeywordProcessing.contains_keyword('exit', msg):
-            self.answer = str('Thank you for using our service. Goodbye.')
-            self.state = State.EXIT
-            self.recognizer.shutdown()
+            self.answer = str('Do you want to exit.')
+            self.state = State.EXIT_CONFIRM
         elif KeywordProcessing.contains_keyword('reset', msg):
             self.answer = str('How can i help you.')
             self.state = State.NORMAL
@@ -224,6 +223,15 @@ class Callcenter(Follwer):
                 self.answer = str('How can i help you.')
                 self.state = State.NORMAL
 
+        elif self.state == State.EXIT_CONFIRM:
+            if KeywordProcessing.contains_keyword('confirm', msg):
+                self.answer = str('Thank you for using our service')
+                self.state = State.EXIT
+                self.recognizer.shutdown()
+            elif KeywordProcessing.contains_keyword('cancel', msg):
+                self.answer = str('How can i help you')
+                self.state = State.NORMAL
+
         if self.answer is not None:
             Speaker.speak(self.answer)
 
@@ -233,5 +241,5 @@ class Callcenter(Follwer):
         self.recognizer.resume()    # Resume Speech recognizer
 
 if __name__ == '__main__':
-    call(['sh', '/home/ksukvichai/bin/sapi_server.sh'])  # Start SAPI service
+    call(['sh', ' ~/bin/sapi_server.sh'])  # Start SAPI service
     callcenter = Callcenter()
